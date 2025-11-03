@@ -1,4 +1,4 @@
-from data_load_parse import data_prep
+from media_db.data_load_parse import data_prep
 import sqlite3
 import json
 
