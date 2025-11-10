@@ -24,7 +24,7 @@ This project is for refreshing knowledge and learning new skills involving all t
 
 The goal is to develop a web app based on a subjective media database to track media suggestions and consumed media by one user (me).
 
-The app allows the following operations:
+The app should allow the following operations:
 - adding an element into the database
 - modifying details of an element
 - querying of all sorts
@@ -42,14 +42,21 @@ Current status:
 - TODO: Docker
 
 ## Database Schema
-Brief description of main entities:
-- movies (id, title, year, runtime, description)
-- shows (id, title, seasons, status)
+Main table repertories all media types in an uniform format:
+- media(id, title, type, release_year, origin_lang, status, comment)
+
+Specific media types have their own table :
+- info_movie (id, title, year, runtime, description)
+- info_tvshow (id, title, seasons, status)
+- info_manga(id, volumes, authors, adapted_anime_id)
+- info_anime(id seasons, ep_duration_min, total_episodes, status)
+- info_book(id, pages, authors, status)
 
 ## Getting Started
 
 ### Prerequisites
 - sqlite3
+- fastapi
 - [Optional] Docker
 - [Optional] language runtime for helpers
 
