@@ -2,18 +2,21 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Media:
+class QuickMedia:
     title: str
-    release_year: int
-    comment: str
-    language: str  # ISO language code (3 letters)
-    status: str  # completed, ongoing
     type: str  # movie, anime, manga, tvshow, book
-    seen: bool
-    rating: int | None
-    rating: int | None
-    last_watch_date: str | None
-    times_consumed: int | None
+    release_year: int
+    status: str  # completed, ongoing
+
+
+@dataclass
+class Media(QuickMedia):
+    language: str | None = None  # ISO language code (3 letters)
+    seen: bool = False
+    rating: int | None = None
+    last_watch_date: str | None = None
+    times_consumed: int = 0
+    comment: str = ""
 
     def __init__(self, **kwargs):
         for field in self.__dataclass_fields__:
@@ -22,63 +25,36 @@ class Media:
 
 @dataclass
 class Movie(Media):
-    duration: int
-    director: list[str]
-    belonging: str  # 'series', 'single','universe'
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.director = kwargs.get("authors", [])
-        self.belonging = kwargs.get("belonging", "")
-        self.duration = kwargs.get("duration", 0)
+    duration: int = 100
+    director: list[str] | None = None
+    belonging: str = "single"
 
 
 @dataclass
 class Manga(Media):
-    volumes: int
-    adapted_to_anime: bool
-    authors: list[str]
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.authors = kwargs.get("authors", [])
-        self.volumes = kwargs.get("volumes", 0)
-        self.adapted_to_anime = kwargs.get("adapted_to_anime", False)
-
-
-@dataclass
-class TVshow(Media):
-    total_episodes: int
-    seasons: int
-    ep_duration_min: int
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.total_episodes = kwargs.get("total_episodes", 0)
-        self.seasons = kwargs.get("seasons", 0)
-        self.ep_duration_min = kwargs.get("ep_duration_min", 0)
-
-
-@dataclass
-class Anime(TVshow):
-    belonging: str  # 'series', 'single','universe'
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.belonging = kwargs.get("belonging", "")
+    volumes: int = 0
+    authors: list[str] | None = None
+    adapted_to_anime: bool = False
 
 
 @dataclass
 class Book(Media):
-    pages: int
-    belonging: str  # 'series', 'single','universe'
-    authors: list[str]
+    pages: int = 0
+    authors: list[str] | None = None
+    belonging: str = "single"
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.authors = kwargs.get("authors", [])
-        self.pages = kwargs.get("pages", 0)
-        self.belonging = kwargs.get("belonging", "")
+
+@dataclass
+class TVshow(Media):
+    ep_duration_min: int = 30
+    seasons: int | None = None
+    total_episodes: int | None = None
+
+
+@dataclass
+class Anime(TVshow):
+    ep_duration_min: int = 24
+    belonging: str = "single"
 
 
 def create_media_instance(
