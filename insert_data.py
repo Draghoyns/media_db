@@ -1,34 +1,61 @@
-from media_db.data_load_parse import data_prep
+from data_load_parse import data_prep
 import sqlite3
 import json
 
 
+# main insert
 def insert_media(data: list[dict], db_path="data/all_media.db"):
+    msg = {"status": "success", "duplicates": [], "inserted": 0, "warning": []}
     # add media element to media table
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     for item in data:
-        cursor.execute(
-            "INSERT INTO media (title, release_year, origin_lang, type, status, comment) VALUES (?, ?, ?, ?, ?, ?)",
-            (
-                item["title"],
-                item["release_year"],
-                item["language"],
-                item["type"],
-                item["status"],
-                item["comment"],
-            ),
-        )
-        id = cursor.lastrowid
+        cursor.execute("SELECT * FROM media WHERE title = ?", (item["title"],))
+        fields = [d[0] for d in cursor.description]
+        res = cursor.fetchall()
+        dic = [dict(zip(fields, row)) for row in res]
+        first_match = dic[0] if dic != [] else None
 
-        insert_type(item, cursor, id)
-        insert_user(item, cursor, id)
+        if (
+            res != []
+            and first_match["type"] == item["type"]  # type: ignore
+            and first_match["release_year"] == item["release_year"]  # type: ignore
+            and first_match["status"] == item["status"]  # type: ignore
+        ):
+            if item not in msg["duplicates"]:
+                msg["duplicates"].append(item)
+            msg["duplicates"].append(first_match)
+            pass
+        else:
+            cursor.execute(
+                "INSERT INTO media (title, release_year, origin_lang, type, status, comment) VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    item["title"],
+                    item["release_year"],
+                    item["language"],
+                    item["type"],
+                    item["status"],
+                    item["comment"],
+                ),
+            )
+            id = cursor.lastrowid
+
+            insert_type(item, cursor, id)
+            insert_user(item, cursor, id)
+            msg["inserted"] += 1
+
+            if res != []:
+                if item not in msg["warning"]:
+                    msg["warning"].append(item)
+                msg["warning"].append(first_match)
 
     conn.commit()
     conn.close()
+    return msg
 
 
+# sub functions
 def insert_type(element: dict, cursor, media_id: int | None):
     # add media element to type specific table
     media_type = element["type"]
@@ -105,4 +132,5 @@ def insert_user(element: dict, cursor, media_id: int | None):
 if __name__ == "__main__":
     csv_data = "./data/raw.csv"
     data = data_prep(csv_data)
-    insert_media(data)
+    msg = insert_media(data)
+    print(msg)
