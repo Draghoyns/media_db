@@ -211,6 +211,6 @@ __marimo__/
 *.dSYM
 
 # data files
-data/
+*.db
 *.csv
 
