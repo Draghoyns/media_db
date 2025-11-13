@@ -13,11 +13,9 @@
     - [Install](#install)
     - [Database Setup](#database-setup)
 - [Usage](#usage)
-    - [Sample Queries](#sample-queries)
 - [Testing](#testing)
-- [Contributing](#contributing)
 - [License](#license)
-- [Contact](#contact)
+- [TODO](#todo)
 
 ## Overview
 This project is for refreshing knowledge and learning new skills involving all tech used.
@@ -33,6 +31,8 @@ The app should allow the following operations:
 Current status:
 - SQL schema set in `schema.sql`
 - CSV file to start populating the database
+- some utility functions and FastAPI endpoints in main.py
+- data insertion : testing (TODO)
 
 
 ## Tech Stack
@@ -69,51 +69,35 @@ cd SQL_entertainment
 
 ### Database Setup
 Initialize database and load schema:
+
 ```bash
-# PostgreSQL example
-createdb entertainment
-psql -d entertainment -f sql/schema.sql
-psql -d entertainment -f sql/seeds.sql
+# SQLite example
+sqlite3 entertainment.db < sql/schema.sql
+# populate database with elements in data/raw.csv
+python populate_db.py
 ```
 If using Docker, provide docker-compose or Dockerfile steps here.
 
 ## Usage
-Run example queries from sql/examples or via psql:
+- Run example queries directly on the database:
 ```bash
-psql -d entertainment -f sql/examples/top_rated_movies.sql
+sqlite3 entertainment.db < sql/examples/top_rated_movies.sql
 ```
+- Operations via FastAPI docs:
+TODO
 
-### Sample Queries
-Top 10 highest-rated movies:
-```sql
-SELECT m.id, m.title, AVG(r.score) AS avg_score
-FROM movies m
-JOIN ratings r ON r.item_id = m.id
-GROUP BY m.id
-ORDER BY avg_score DESC
-LIMIT 10;
-```
 
 ## Testing
-Describe how to run tests, if any (SQL unit tests or integration):
-```bash
-# run SQL test suite (example)
-./scripts/run_tests.sh
-```
-
-## Contributing
-- Fork the repo
-- Create a branch: feature/your-feature
-- Add migrations and seeds for schema changes
-- Open a PR with description and related SQL examples
+Function tests are located in `test.py`.
 
 ## License
-Specify license (e.g., MIT). See LICENSE file.
+This project is licensed under the [MIT License](LICENSE).
 
-## Contact
-Project maintainer: Your Name — email@example.com
+
+## TODO
 
 Placeholders:
-- Replace example SQL and file paths with real files in sql/
 - Add CI badges and workflow docs as needed
-- Keep schema and seeds in sql/schema.sql and sql/seeds.sql
+- Add how to populate database
+- Explain usage with FastAPI
+- Think about Docker ?
